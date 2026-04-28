@@ -11,9 +11,11 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "lint": "turbo lint"
+    "lint": "turbo lint",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
+    "prisma": "^5.0.0",
     "turbo": "^2.0.0"
   },
   "prisma": {

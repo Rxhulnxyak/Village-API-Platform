@@ -11,9 +11,9 @@ Railway will host your persistent API server.
 
 1.  **Connect Repo**: Import `Village-API-Platform` in Railway.
 2.  **Settings**:
-    -   **Root Directory**: `api`
-    -   **Build Command**: `npm install && npm run build`
-    -   **Start Command**: `node dist/server.js`
+    -   **Root Directory**: `.` (Keep as root to support Monorepo/Prisma)
+    -   **Build Command**: `npm install && npx turbo build --filter=api`
+    -   **Start Command**: `npm start --prefix api`
 3.  **Environment Variables**: Add your `.env` variables to the Railway "Variables" tab.
 4.  **Public URL**: Railway will give you a URL like `https://api-production.up.railway.app`. **Copy this URL.**
 
