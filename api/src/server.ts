@@ -1,7 +1,5 @@
 import app from './app';
 import { prisma } from './lib/prisma';
-import { redis } from './lib/redis';
-
 const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, () => {
@@ -15,9 +13,6 @@ process.on('SIGTERM', () => {
   server.close(async () => {
     console.log('HTTP server closed.');
     await prisma.$disconnect();
-    if (redis) {
-      redis.disconnect();
-    }
     process.exit(0);
   });
 });
