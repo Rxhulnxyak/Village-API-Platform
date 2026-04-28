@@ -46,7 +46,13 @@ See [SETUP.md](./SETUP.md) for local installation instructions.
 | States list | 3ms | 8ms | 15ms |
 
 ## Data Coverage
-- States: 36
-- Districts: 741
-- Sub-districts: 6,081
-- Villages: 597,418
+- States: 30
+- Districts: 616
+- Sub-districts: 6,381
+- Villages: 619,226 (Verified MDDS 2011)
+
+## Key Features
+- **High-Performance Search**: Powered by PostgreSQL GIN Trigram indexes for sub-100ms fuzzy matching across 600k+ records.
+- **Modern Landing Page**: Revamped UI with Glassmorphism, Dark Mode, and Framer Motion animations.
+- **Robust ETL**: Automated Python ingestion pipeline for handling complex MDDS Excel datasets.
+- **B2B Ready**: Integrated API key authentication, rate limiting, and performance monitoring.
