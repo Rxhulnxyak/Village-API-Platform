@@ -1,0 +1,13 @@
+node_modules
+.env
+dist
+.turbo
+__pycache__
+*.pyc
+.vercel
+prisma/migrations/*.sql
+!prisma/migrations/manual_extensions.sql
+all-india-villages-master-list-excel/
+scratch/
+.DS_Store
+*.log

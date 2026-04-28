@@ -1,0 +1,23 @@
+{
+  "name": "villageapi",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "api",
+    "frontend-admin",
+    "frontend-b2b",
+    "demo"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint"
+  },
+  "dependencies": {
+    "turbo": "^2.0.0"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "packageManager": "npm@10.0.0"
+}

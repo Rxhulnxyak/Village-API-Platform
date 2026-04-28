@@ -1,0 +1,165 @@
+// Prisma Schema for VillageAPI
+// This file defines the PostgreSQL database schema and the Prisma Client generator.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  // WHY TWO URLS: DATABASE_URL uses pgBouncer connection pooling (essential for serverless
+  // — each Vercel function invocation would exhaust PostgreSQL's connection limit without it).
+  // DIRECT_URL bypasses pgBouncer for Prisma migrations (pgBouncer doesn't support
+  // the extended query protocol that Prisma migrations require).
+}
+
+// Country Model
+// Represents the top-level entity in the geographical hierarchy.
+model Country {
+  // cuid2 is URL-safe, sortable, harder to enumerate than numeric IDs
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  callingCode String
+  createdAt   DateTime @default(now())
+  states      State[]
+}
+
+// State Model
+// Represents states and union territories.
+model State {
+  id          String   @id @default(cuid())
+  mddsCode    String   @unique
+  name        String
+  countryId   String
+  country     Country  @relation(fields: [countryId], references: [id])
+  districts   District[]
+  userAccess  UserStateAccess[]
+  createdAt   DateTime @default(now())
+}
+
+// District Model
+model District {
+  id           String   @id @default(cuid())
+  mddsCode     String
+  name         String
+  stateId      String
+  state        State    @relation(fields: [stateId], references: [id])
+  subDistricts SubDistrict[]
+  createdAt    DateTime @default(now())
+
+  // WHY COMPOSITE UNIQUE: MDDS codes are only unique within a state
+  @@unique([mddsCode, stateId])
+}
+
+// SubDistrict Model
+// Represents blocks/tehsils/talukas.
+model SubDistrict {
+  id         String   @id @default(cuid())
+  mddsCode   String
+  name       String
+  districtId String
+  district   District @relation(fields: [districtId], references: [id])
+  villages   Village[]
+  createdAt  DateTime @default(now())
+
+  @@unique([mddsCode, districtId])
+}
+
+// Village Model
+// The core entity representing over 600,000 localities.
+model Village {
+  id            String      @id @default(cuid())
+  mddsPlcn      String      @unique
+  name          String
+  subDistrictId String
+  subDistrict   SubDistrict @relation(fields: [subDistrictId], references: [id])
+  createdAt     DateTime    @default(now())
+
+  // Base index; GIN trigram index added via manual SQL migration for fuzzy search
+  @@index([name])
+  // Critical for hierarchy traversal queries
+  @@index([subDistrictId])
+}
+
+enum PlanType {
+  FREE
+  PREMIUM
+  PRO
+  UNLIMITED
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+// User Model
+// Represents B2B clients and admins.
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  businessName String
+  phone        String?
+  gstNumber    String?
+  planType     PlanType @default(FREE)
+  status       UserStatus @default(PENDING)
+  apiKeys      ApiKey[]
+  stateAccess  UserStateAccess[]
+  logs         ApiLog[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ApiKey Model
+// Stores API keys and their bcrypt-hashed secrets for B2B users.
+model ApiKey {
+  id         String   @id @default(cuid())
+  key        String   @unique // format ak_[32hex]
+  secretHash String
+  name       String
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  isActive   Boolean  @default(true)
+  lastUsedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  // Auth lookup happens on EVERY API request — this index is the most performance-critical in the entire schema
+  @@index([key])
+}
+
+// UserStateAccess Model
+// Controls fine-grained geographical access for FREE/PREMIUM tiers.
+model UserStateAccess {
+  userId  String
+  stateId String
+  user    User  @relation(fields: [userId], references: [id])
+  state   State @relation(fields: [stateId], references: [id])
+
+  // Composite primary key
+  @@id([userId, stateId])
+}
+
+// ApiLog Model
+// Stores asynchronous logs for analytics and dashboard visualization.
+model ApiLog {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  endpoint       String
+  method         String
+  statusCode     Int
+  responseTimeMs Int
+  ipAddress      String?
+  cacheHit       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  // Composite index for time-series queries filtering by user
+  @@index([userId, createdAt])
+  // Index for error filtering
+  @@index([statusCode])
+}
