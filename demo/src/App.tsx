@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Search, MapPin, Building2, Fingerprint, Moon, Sun, Loader2 } from 'lucide-react';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 const DEMO_KEY = 'ak_demo0000000000000000000000000000';
 const DEMO_SECRET = 'demo_secret';
 const headers = { 'X-API-KEY': DEMO_KEY, 'X-API-SECRET': DEMO_SECRET };

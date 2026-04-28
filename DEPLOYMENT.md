@@ -1,42 +1,49 @@
-# 🚀 Deployment Guide - VillageAPI
+# 🚀 Deployment Guide - VillageAPI (Split Strategy)
 
-This project is optimized for deployment on **Vercel** (Frontend/Serverless API) and **Railway** (Persistent API Server).
-
----
-
-## 🏗️ Option 1: Full Stack on Vercel (Recommended)
-Vercel handles both the static frontend and the serverless backend functions.
-
-### Steps:
-1.  **Push to GitHub**: Ensure all changes are pushed to your [Village-API-Platform](https://github.com/Rxhulnxyak/Village-API-Platform.git) repository.
-2.  **Connect to Vercel**:
-    -   Log in to [Vercel](https://vercel.com).
-    -   Click **New Project** and import your repository.
-3.  **Configure Project Settings**:
-    -   **Root Directory**: Keep as `.` (root).
-    -   **Build Command**: `npm run build`
-    -   **Install Command**: `npm install`
-4.  **Environment Variables**:
-    -   Add all variables from your `.env` file (DATABASE_URL, UPSTASH_REDIS_REST_URL, etc.).
-5.  **Deploy**: Vercel will detect the `vercel.json` and automatically route requests to `/v1/*` to your API.
+For maximum performance and stability, we use a split deployment strategy:
+- **Backend (API)**: Hosted on **Railway** (Persistent Node.js server, no cold starts).
+- **Frontend (Admin/B2B/Demo)**: Hosted on **Vercel** (Global CDN for ultra-fast load times).
 
 ---
 
-## 🚂 Option 2: Persistent API on Railway
-If you prefer a persistent server (instead of serverless functions) for your backend, Railway is the best choice.
+## 🚂 Step 1: Deploy Backend to Railway
+Railway will host your persistent API server.
 
-### Steps:
-1.  **Log in to [Railway.app](https://railway.app)**.
-2.  **Create New Project**: Select "Deploy from GitHub repo".
-3.  **Select Repository**: Choose `Village-API-Platform`.
-4.  **Configure Service**:
-    -   Railway will detect the monorepo. Select the `api` folder as the source for the backend service.
+1.  **Connect Repo**: Import `Village-API-Platform` in Railway.
+2.  **Settings**:
+    -   **Root Directory**: `api`
     -   **Build Command**: `npm install && npm run build`
-    -   **Start Command**: `npm start` (which runs `node dist/server.js`)
-5.  **Environment Variables**:
-    -   Go to the **Variables** tab in Railway.
-    -   Paste your `.env` contents.
-6.  **Public URL**: Railway will provide a URL like `village-api-production.up.railway.app`. Use this URL in your frontend `App.tsx`.
+    -   **Start Command**: `node dist/server.js`
+3.  **Environment Variables**: Add your `.env` variables to the Railway "Variables" tab.
+4.  **Public URL**: Railway will give you a URL like `https://api-production.up.railway.app`. **Copy this URL.**
+
+---
+
+## 🏗️ Step 2: Deploy Frontends to Vercel
+Vercel will host your three frontend applications.
+
+### For each folder (`demo`, `frontend-admin`, `frontend-b2b`):
+1.  **Create New Project** in Vercel.
+2.  **Root Directory**: Set to the specific folder (e.g., `demo`).
+3.  **Framework Preset**: Vite.
+4.  **Environment Variables**: 
+    -   Add `VITE_API_URL` = **[Your Railway Backend URL]** (e.g., `https://api-production.up.railway.app`)
+5.  **Deploy**.
+
+---
+
+## 🛠️ Global Infrastructure
+
+| Service | Provider | Purpose |
+| :--- | :--- | :--- |
+| **API Backend** | [Railway](https://railway.app) | Persistent compute, real-time logging. |
+| **Frontend Apps** | [Vercel](https://vercel.com) | Global CDN, automatic previews. |
+| **Database** | [NeonDB](https://neon.tech/) | Serverless PostgreSQL (MDDS dataset). |
+| **Cache/Limit** | [Upstash](https://upstash.com/) | Serverless Redis (Rate limiting). |
+
+---
+
+Built with ❤️ by Rxhulnxyak
 
 ---
 
