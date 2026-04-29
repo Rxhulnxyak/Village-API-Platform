@@ -17,9 +17,16 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 // Slow query logging: queries >500ms logged in development to identify N+1 problems
+const PROD_DB = "postgresql://neondb_owner:npg_2FBmEL5ahXPW@ep-proud-violet-anpv4637-pooler.c-6.us-east-1.aws.neon.tech/neondb?sslmode=require";
+
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL || PROD_DB
+      }
+    },
     log: [
       { emit: 'event', level: 'query' },
       { emit: 'stdout', level: 'error' },

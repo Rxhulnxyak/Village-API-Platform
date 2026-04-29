@@ -9,7 +9,8 @@ export const adminAuth = (req: Request, res: Response, next: NextFunction) => {
 
   const token = authHeader.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any;
+    const JWT_SECRET = process.env.JWT_SECRET || "d8974be39f395aca694f7420ac4f89538a180a7531be0f65495cd3517195c2f4";
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
     if (decoded.role !== 'ADMIN') {
       return res.status(403).json({ error: 'Insufficient permissions' });
     }

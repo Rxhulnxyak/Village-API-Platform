@@ -9,10 +9,12 @@
 
 import { Redis } from '@upstash/redis';
 
-export const redis = process.env.REDIS_URL && process.env.REDIS_TOKEN
+const PROD_DB = "postgresql://neondb_owner:npg_2FBmEL5ahXPW@ep-proud-violet-anpv4637-pooler.c-6.us-east-1.aws.neon.tech/neondb?sslmode=require";
+
+export const redis = (process.env.REDIS_URL || "https://huge-cow-69321.upstash.io") && (process.env.REDIS_TOKEN || "gQAAAAAAAQ7JAAIgcDFjNTY1NmI2YjNjMjk0N2RkYjM3ODg5Y2FhODY2MDY0Mw")
   ? new Redis({
-      url: process.env.REDIS_URL,
-      token: process.env.REDIS_TOKEN,
+      url: process.env.REDIS_URL || "https://huge-cow-69321.upstash.io",
+      token: process.env.REDIS_TOKEN || "gQAAAAAAAQ7JAAIgcDFjNTY1NmI2YjNjMjk0N2RkYjM3ODg5Y2FhODY2MDY0Mw",
     })
   : null;
 
