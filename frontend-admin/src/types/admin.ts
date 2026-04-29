@@ -65,6 +65,7 @@ export interface StateAccessMatrix {
 
 export interface TableColumn<T> {
   header: string;
-  accessorKey: keyof T | string;
+  accessorKey?: keyof T | string;
+  id?: string;
   cell?: (info: { row: { original: T } }) => React.ReactNode;
 }

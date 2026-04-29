@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { b2bApi } from './api';
-import { Key, Layout, LogOut, Activity, Book, Shield, Copy, Trash2, Plus, Check } from 'lucide-react';
+import { Key, Layout, LogOut, Activity, Book, Shield, Trash2, Plus, Check } from 'lucide-react';
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('b2b_token'));
@@ -57,11 +57,11 @@ export default function App() {
           <KeysList 
             keys={keys} 
             newKey={newKey} 
-            onDelete={async (id) => {
+            onDelete={async (id: string) => {
               await b2bApi.deleteKey(id);
               setKeys(keys.filter(k => k.id !== id));
             }}
-            onCreate={async (name) => {
+            onCreate={async (name: string) => {
               const res = await b2bApi.createKey(name);
               setNewKey(res.data);
               setKeys([res.data, ...keys]);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Search, MapPin, Building2, Fingerprint, Moon, Sun, Loader2 } from 'lucide-react';
 
@@ -22,7 +22,7 @@ export default function App() {
   const [results, setResults] = useState<Village[]>([]);
   const [loading, setLoading] = useState(false);
   const [showDrop, setShowDrop] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+
   const [isDark, setIsDark] = useState(false);
   const debounceRef = useRef<any>(null);
 
@@ -58,7 +58,7 @@ export default function App() {
     setQuery(term);
     setShowDrop(false);
     setLoading(true);
-    setHasSearched(true);
+
     try {
       const res = await axios.get(`${API_URL}/v1/search?q=${encodeURIComponent(term)}&limit=20`, { headers });
       setResults(Array.isArray(res.data) ? res.data : res.data.results || []);
